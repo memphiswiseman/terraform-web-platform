@@ -35,15 +35,17 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-# Launch Configuration (Ubuntu)
-resource "aws_launch_configuration" "app" {
-  name_prefix     = "${var.env_name}-lc-"
-  image_id        = var.app_ami
-  instance_type   = var.instance_type
-  security_groups = [var.app_sg_id]
-  associate_public_ip_address = false
+resource "aws_launch_template" "app" {
+  name_prefix   = "${var.env_name}-lt-"
+  image_id      = var.app_ami
+  instance_type = var.instance_type
 
-  user_data = <<-EOF
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups             = [var.app_sg_id]
+  }
+
+  user_data = base64encode(<<-EOF
     #!/bin/bash
     set -e
     export DEBIAN_FRONTEND=noninteractive
@@ -51,8 +53,9 @@ resource "aws_launch_configuration" "app" {
     apt-get install -y nginx
     systemctl enable nginx
     systemctl start nginx
-    echo "<h1>Hello from ${var.env_name} - $(hostname)</h1>" > /var/www/html/index.html
+    echo "<h1 style='color: blue; text-align: center;'>Hello from HUG-Ibadan ${var.env_name} - $(hostname)</h1>" > /var/www/html/index.html
   EOF
+  )
 
   lifecycle {
     create_before_destroy = true
@@ -68,7 +71,11 @@ resource "aws_autoscaling_group" "app" {
   vpc_zone_identifier       = var.private_subnet_ids
   health_check_type         = "EC2"
   force_delete              = true
-  launch_configuration      = aws_launch_configuration.app.name
+
+  launch_template {
+    id      = aws_launch_template.app.id
+    version = "$Latest"
+  }
 
   target_group_arns = [aws_lb_target_group.app_tg.arn]
 
@@ -102,7 +109,7 @@ resource "aws_autoscaling_policy" "scale_in" {
   policy_type            = "SimpleScaling"
 }
 
-# SNS topic for alarms (you can subscribe an email in console)
+# SNS topic for alarms
 resource "aws_sns_topic" "alerts" {
   name = "${var.env_name}-app-alarms"
 }
@@ -118,13 +125,13 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   period              = 60
   statistic           = "Average"
   alarm_description   = "Scale out when average CPU is high"
-  dimensions = {}
+  dimensions          = {}
   alarm_actions = [
     aws_autoscaling_policy.scale_out.arn,
     aws_sns_topic.alerts.arn
   ]
   insufficient_data_actions = []
-  ok_actions = [aws_sns_topic.alerts.arn]
+  ok_actions                = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_low" {
@@ -137,11 +144,11 @@ resource "aws_cloudwatch_metric_alarm" "cpu_low" {
   period              = 60
   statistic           = "Average"
   alarm_description   = "Scale in when average CPU is low"
-  dimensions = {}
+  dimensions          = {}
   alarm_actions = [
     aws_autoscaling_policy.scale_in.arn,
     aws_sns_topic.alerts.arn
   ]
   insufficient_data_actions = []
-  ok_actions = [aws_sns_topic.alerts.arn]
+  ok_actions                = [aws_sns_topic.alerts.arn]
 }

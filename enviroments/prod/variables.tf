@@ -4,67 +4,92 @@ variable "aws_region" {
 }
 
 variable "env" {
-  description = "Environment name (dev or prod)"
+  description = "Environment name (dev/prod)"
   type        = string
 }
 
 variable "vpc_cidr" {
-  description = "VPC CIDR block"
+  description = "VPC CIDR"
   type        = string
 }
 
 variable "public_subnet_cidrs" {
-  description = "List of public subnet CIDRs"
+  description = "Public subnets (2)"
   type        = list(string)
 }
 
 variable "private_subnet_cidrs" {
-  description = "List of private subnet CIDRs"
+  description = "Private subnets (2)"
   type        = list(string)
 }
 
 variable "availability_zones" {
-  description = "Availability zones to deploy into"
+  description = "AZs (2)"
   type        = list(string)
 }
 
 variable "app_ami" {
-  description = "AMI ID for app servers"
+  description = "Ubuntu AMI for app nodes"
   type        = string
 }
 
 variable "instance_type" {
-  description = "App server instance type"
+  description = "App instance type"
   type        = string
+  default     = "t3.micro"
 }
 
-variable "db_username" {
-  description = "Database username"
-  type        = string
+variable "asg_min_size" {
+  type        = number
+  default     = 1
 }
 
+variable "asg_max_size" {
+  type        = number
+  default     = 3
+}
+
+variable "asg_desired_capacity" {
+  type        = number
+  default     = 2
+}
+
+variable "alarm_cpu_high_threshold" {
+  description = "Scale out threshold"
+  type        = number
+  default     = 70
+}
+
+variable "alarm_cpu_low_threshold" {
+  description = "Scale in threshold"
+  type        = number
+  default     = 25
+}
+
+# DB
+variable "db_username" { type = string }
 variable "db_password" {
-  description = "Database password"
-  type        = string
-  sensitive   = true
+  type      = string
+  sensitive = true
+}
+variable "db_name" { type = string }
+
+variable "allocated_storage" {
+  type    = number
+  default = 20
 }
 
-variable "db_name" {
-  description = "Database name"
-  type        = string
+variable "db_instance_class" {
+  type    = string
+  default = "db.t3.micro"
 }
 
-variable "alb_sg_id" {
-  description = "ALB Security Group ID"
-  type        = string
+variable "multi_az" {
+  type    = bool
+  default = false
 }
 
-variable "app_sg_id" {
-  description = "App Security Group ID"
-  type        = string
-}
-
-variable "db_sg_id" {
-  description = "DB Security Group ID"
-  type        = string
+variable "backup_retention_period" {
+  type    = number
+  default = 7
 }
