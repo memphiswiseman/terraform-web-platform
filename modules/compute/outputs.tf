@@ -1,15 +1,24 @@
 output "alb_dns_name" {
-  value = aws_lb.app_lb.dns_name
+  description = "DNS of ALB"
+  value       = aws_lb.app_alb.dns_name
 }
 
 output "alb_arn" {
-  value = aws_lb.app_lb.arn
+  description = "ALB ARN"
+  value       = aws_lb.app_alb.arn
 }
 
-output "app_instance_ids" {
-  value = aws_instance.app[*].id
+output "alb_target_group_arn" {
+  description = "Target Group ARN"
+  value       = aws_lb_target_group.app_tg.arn
 }
 
-output "target_group_arn" {
-  value = aws_lb_target_group.app_tg.arn
+output "asg_name" {
+  description = "Auto Scaling Group name"
+  value       = aws_autoscaling_group.app.name
+}
+
+output "sns_topic_arn" {
+  description = "SNS Topic ARN for alarms"
+  value       = aws_sns_topic.alerts.arn
 }
