@@ -6,7 +6,7 @@ The goal is to design a modular and reusable Terraform infrastructure that provi
 
  -Project Structure:
  
-terraform-web-platform/
+```terraform-web-platform/
 ├── .gitignore
 ├── environments/
 │   ├── dev/
@@ -22,7 +22,7 @@ terraform-web-platform/
 ├── modules/
 │   ├── networking/
 │   ├── compute/
-│   ├── database/
+│   ├── database/```
 
 
 .environments/ → Contains configuration for separate environments (dev & prod).
@@ -40,31 +40,31 @@ terraform-web-platform/
 
   **Getting Started:**
   
-```1️⃣ Clone the Repository
+1️⃣ Clone the Repository
 
-git clone https://github.com/<your-username>/terraform-web-platform.git
-cd terraform-web-platform
+```git clone https://github.com/<your-username>/terraform-web-platform.git
+cd terraform-web-platform```
 
 2️⃣ Initialize Terraform
 
-cd environments/dev   # or prod
-terraform init
+```cd environments/dev   # or prod
+terraform init```
 
 3️⃣ Plan the Infrastructure
-terraform plan
+```terraform plan```
 
 4️⃣ Apply the Infrastructure
-terraform apply
+```terraform apply```
 
-🔑 Requirements
+ **Requirements:**
 
-Terraform >= 1.5
+.Terraform >= 1.5
 
-AWS CLI configured with proper credentials
+.AWS CLI configured with proper credentials
 
-An AWS account with permissions to create resources (VPC, EC2, RDS, ALB, etc.)
+.An AWS account with permissions to create resources (VPC, EC2, RDS, ALB, etc.)
 
-📌 Notes
+Notes:
 
 State files are not committed thanks to .gitignore.
 
@@ -72,4 +72,4 @@ Variables are environment-specific and stored in terraform.tfvars.
 
 Infrastructure can be destroyed using:
 
-terraform destroy```
+```terraform destroy```
